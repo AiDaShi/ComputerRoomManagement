@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerRoomClient", "Compu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogsLibrary", "LogsLibrary\LogsLibrary.csproj", "{1F985B74-DB85-440B-B4B7-1A5320994BB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemLibrary", "SystemLibrary\SystemLibrary.csproj", "{F83EAD0C-157D-4117-A2CB-AF2B799EF433}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{1F985B74-DB85-440B-B4B7-1A5320994BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F985B74-DB85-440B-B4B7-1A5320994BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F985B74-DB85-440B-B4B7-1A5320994BB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F83EAD0C-157D-4117-A2CB-AF2B799EF433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F83EAD0C-157D-4117-A2CB-AF2B799EF433}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F83EAD0C-157D-4117-A2CB-AF2B799EF433}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F83EAD0C-157D-4117-A2CB-AF2B799EF433}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

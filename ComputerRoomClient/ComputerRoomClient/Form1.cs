@@ -5,8 +5,10 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SystemLibrary;
 using ComputerRoomClient.Tools;
 
 namespace ComputerRoomClient
@@ -20,6 +22,12 @@ namespace ComputerRoomClient
             LogsHandle.LogsAddMessage("Welcome To ||| Computer Room Client |||");
             LogsHandle.LogsAddMessage("Welcome To ||| Computer Room Client |||");
             LogsHandle.LogsAddMessage("Welcome To ||| Computer Room Client |||");
+
+            #region SetSystem
+
+            SystemTools.StartSystemWorkFlow();
+
+            #endregion
         }
 
         private void customizeDesing()
@@ -127,5 +135,27 @@ namespace ComputerRoomClient
             }
         }
         #endregion
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(3000);
+                    if (SystemScheduler.CPUList.Count > 0)
+                    {
+                        this.CPULablePercent.Text = SystemScheduler.CPUList.Last().AllValue + "%";
+                    }
+                    if (SystemScheduler.MenmoryList.Count > 0)
+                    {
+                        this.MenmoryLablePercent.Text = SystemScheduler.MenmoryList.Last().AllValue + "%";
+                    }
+                    //this.CPULablePercent.Text = 
+                    Thread.Sleep(3000);
+                }
+
+            });
+        }
     }
 }

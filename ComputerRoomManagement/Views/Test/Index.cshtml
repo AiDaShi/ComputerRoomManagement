@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<button id="submit">提交</button>
+<div id="result" style="color: green; font-weight: bold;"></div>
+
+<script src="~/lib/@@aspnet/signalr/dist/browser/signalr.js"></script>
+<script>
+    let connection = null;
+
+    setupConnection = () => {
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl("/count")
+            .build();
+        connection.on("someFunc", function (obj) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML += "<br>这里是 SomeFunc 方法，值有：" + obj.random;
+        });
+
+        connection.on("ReceiveUpdate", (update) => {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML += "<br>这里是 ReceiveUpdate 方法，值有：" + update;
+        });
+        connection.on("Close", (value) => {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML += "<br>这里是 Close 方法，有：" + value+" 玩家成功下线！";
+        });
+        connection.on("finished", function () {
+            connection.stop();
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "通信结束！！！";
+        });
+
+        connection.start()
+            .catch(err => console.error(err.toString()));
+    };
+
+    setupConnection();
+
+    document.getElementById("submit").addEventListener("click", e => {
+        e.preventDefault();
+
+        fetch("/api/count",
+            {
+                method: "POST"
+            })
+            .then(response => response.text())
+            .then(id => connection.invoke("GetLatestCount", id));
+
+    });
+
+</script>

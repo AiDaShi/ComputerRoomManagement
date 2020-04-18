@@ -20,5 +20,16 @@ namespace ComputerRoomClient.Tools
 
             }
         }
+        public static void FromHubLogsAdd(string str)
+        {
+            try
+            {
+                LogThreadQueue.queue.Enqueue("【Hub】"+str);
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
     }
 }

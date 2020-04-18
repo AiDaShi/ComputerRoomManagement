@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ComputerRoomClient.Tools;
 using LogsLibrary.InitLog;
 using LogsLibrary.QueueLog;
 
@@ -21,11 +22,12 @@ namespace ComputerRoomClient
             Global.MainForm = new Form1();
             Global.IsConnectionServer = false;
 
-            #region MyRegion
+            #region SetLogger
             //Set Log Method
             LogThreadQueue.LIFL.Add(new InitUILogLable(Global.MainForm.LogUILable));
             LogThreadQueue.StateLogThreadQueue();
             #endregion
+
             Application.Run(Global.MainForm);
         }
     }

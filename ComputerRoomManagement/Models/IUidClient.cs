@@ -5,8 +5,8 @@ namespace ComputerRoomManagement.Models
 {
     public class IUidClient
     {
-        public Task GetLoginUser()
-        {
-        }
+        //public Task GetLoginUser()
+        //{
+        //}
     }
 }

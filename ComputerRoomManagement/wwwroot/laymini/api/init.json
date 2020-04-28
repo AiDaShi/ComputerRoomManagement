@@ -1,0 +1,33 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "/Home/Panel"
+  },
+  "logoInfo": {
+    "title": "Computer Room",
+    "image": "logo.png",
+    "href": ""
+  },
+  "menuInfo": [
+    {
+      "title": "系统管理",
+      "icon": "fa fa-gears",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "首页",
+          "href": "/Home/Panel",
+          "icon": "fa fa-home",
+          "target": "_self"
+        },
+        {
+          "title": "系统管理",
+          "href": "/Home/Table",
+          "icon": "fa fa-file-text",
+          "target": "_self"
+        }
+      ]
+    }
+  ]
+}

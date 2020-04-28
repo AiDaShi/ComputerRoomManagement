@@ -1,0 +1,733 @@
+﻿@{
+    Layout = null;
+    string CurrentMouthTime = DateTime.Now.ToString("yyyy年MM月");
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Computer Room</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/laymini/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="/laymini/lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+    <link rel="stylesheet" href="/laymini/css/public.css" media="all">
+    <style>
+        .top-panel {
+            border: 1px solid #eceff9;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+            .top-panel > .layui-card-body {
+                height: 60px;
+            }
+
+        .top-panel-number {
+            line-height: 60px;
+            font-size: 30px;
+            border-right: 1px solid #eceff9;
+        }
+
+        .top-panel-tips {
+            line-height: 30px;
+            font-size: 12px
+        }
+    </style>
+</head>
+<body>
+    <!--<div class="layuimini-container">-->
+    <div class="layuimini-main">
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-xs12 layui-col-md3">
+
+                <div class="layui-card top-panel">
+                    <div class="layui-card-header">当日CPU平均率</div>
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space5">
+                            <div id="dayCountCPU" class="layui-col-xs12 layui-col-md12 top-panel-number">
+                                --/--
+                            </div>
+                            @*<div class="layui-col-xs3 layui-col-md3 top-panel-tips">
+                                比昨天 <a style="color: #1aa094">▲0.12</a><br>
+                                比七日 <a style="color: #bd3004">▼0.06</a>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="layui-col-xs12 layui-col-md3">
+
+                <div class="layui-card top-panel">
+                    <div class="layui-card-header">当月CPU平均率</div>
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space5">
+                            <div id="monthlyCountCPU" class="layui-col-xs12 layui-col-md12 top-panel-number">
+                                --/--
+                            </div>
+                            @*<div class="layui-col-xs3 layui-col-md3 top-panel-tips">
+                                比昨天 <a style="color: #1aa094">▲0.12</a><br>
+                                比七日 <a style="color: #bd3004">▼0.06</a>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="layui-col-xs12 layui-col-md3">
+
+                <div class="layui-card top-panel">
+                    <div class="layui-card-header">当日内存平均率</div>
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space5">
+                            <div id="dayCountMemory" class="layui-col-xs12 layui-col-md12 top-panel-number">
+                                --/--
+                            </div>
+                            @*<div class="layui-col-xs3 layui-col-md3 top-panel-tips">
+                                比昨天 <a style="color: #1aa094">▲0.12</a><br>
+                                比七日 <a style="color: #bd3004">▼0.06</a>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="layui-col-xs12 layui-col-md3">
+
+                <div class="layui-card top-panel">
+                    <div class="layui-card-header">当月内存平均率</div>
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space5">
+                            <div id="monthlyCountMemory" class="layui-col-xs12 layui-col-md12 top-panel-number">
+                                --/--
+                            </div>
+                            @*<div class="layui-col-xs3 layui-col-md3 top-panel-tips">
+                                比昨天 <a style="color: #1aa094">▲0.12</a><br>
+                                比七日 <a style="color: #bd3004">▼0.06</a>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-xs12 layui-col-md9">
+                <div id="echarts-records" style="background-color:#ffffff;min-height:400px;padding: 10px"></div>
+            </div>
+            <div class="layui-col-xs12 layui-col-md3">
+                <div id="echarts-pies" style="background-color:#ffffff;min-height:400px;padding: 10px"></div>
+            </div>
+        </div>
+
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-xs12 layui-col-md6">
+                <div id="echarts-dataset" style="background-color:#ffffff;min-height:300px;padding: 10px"></div>
+            </div>
+            <div class="layui-col-xs12 layui-col-md6">
+                <div id="echarts-map" style="background-color:#ffffff;min-height:300px;padding: 10px"></div>
+            </div>
+        </div>
+
+
+    </div>
+    <!--</div>-->
+    <script src="/laymini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="/laymini/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+    <script>
+        function wait(time) {
+            return new Promise(function (resolve, reject) {
+                setTimeout(resolve, time);
+            });
+        }
+        layui.use(['layer', 'echarts', 'jquery'], function () {
+            var $ = layui.jquery,
+                layer = layui.layer,
+                echarts = layui.echarts;
+
+            /**
+             * 报表功能
+             */
+            var echartsRecords = echarts.init(document.getElementById('echarts-records'), 'walden');
+
+            var optionRecords = {
+                title: {
+                    text: 'CPU统计图'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        label: {
+                            backgroundColor: '#6a7985'
+                        }
+                    }
+                },
+                legend: {
+                    data: []// ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: ['--', '--', '--', '--', '--', '--', '--']
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    //{
+                    //    name: '邮件营销',
+                    //    type: 'line',
+                    //    stack: '百分比',
+                    //    areaStyle: {},
+                    //    data: [120, 132, 101, 134, 90, 230, 210]
+                    //},
+                    //{
+                    //    name: '联盟广告',
+                    //    type: 'line',
+                    //    stack: '百分比',
+                    //    areaStyle: {},
+                    //    data: [220, 182, 191, 234, 290, 330, 310]
+                    //},
+                    //{
+                    //    name: '视频广告',
+                    //    type: 'line',
+                    //    stack: '百分比',
+                    //    areaStyle: {},
+                    //    data: [150, 232, 201, 154, 190, 330, 410]
+                    //},
+                    //{
+                    //    name: '直接访问',
+                    //    type: 'line',
+                    //    stack: '百分比',
+                    //    areaStyle: {},
+                    //    data: [320, 332, 301, 334, 390, 330, 320]
+                    //},
+                    //{
+                    //    name: '搜索引擎',
+                    //    type: 'line',
+                    //    stack: '百分比',
+                    //    label: {
+                    //        normal: {
+                    //            show: true,
+                    //            position: 'top'
+                    //        }
+                    //    },
+                    //    areaStyle: {},
+                    //    data: [820, 932, 901, 934, 1290, 1330, 1320]
+                    //}
+                ]
+            };
+            
+            echartsRecords.setOption(optionRecords);
+
+            function postData(url, data) {
+                // Default options are marked with *
+                return fetch(url,
+                    {
+                        body: JSON.stringify(data), // must match 'Content-Type' header
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, same-origin, *omit
+                        headers: {
+                            'user-agent': 'Mozilla/4.0 MDN Example',
+                            'content-type': 'application/json'
+                        },
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, cors, *same-origin
+                        redirect: 'follow', // manual, *follow, error
+                        referrer: 'no-referrer', // *client, no-referrer
+                    })
+                    .then(response => response.json()); // parses response to JSON
+            }
+
+            //处理总月化方法（上面那一行）
+            function handlermonthMethod(data) {
+                if (data.code==200) {
+                    $("#dayCountCPU").text(data.data.dayCountCPU.toFixed(2)+"%");
+                    $("#monthlyCountCPU").text(data.data.monthlyCountCPU.toFixed(2)+"%");
+                    $("#dayCountMemory").text(data.data.dayCountMemory.toFixed(2)+"%");
+                    $("#monthlyCountMemory").text(data.data.monthlyCountMemory.toFixed(2)+"%");
+                }
+            }
+            
+            //柱状图处理总月化方法（下面那一行）
+            function handlermonthHistogramMethod(data) {
+                if (data.code == 200) {
+                    for (var i = 0; i < data.data.length; i++) {
+                        optionDataset.dataset.source.push({
+                            product: data.data[i].name,
+                            '本月内存情况': data.data[i].memory
+                        });
+                        optionDataset.series.push({ type: 'bar' });
+                    }
+                    echartsDataset.setOption(optionDataset);
+                }
+            }
+            //处理图表的方法
+            function handlerpostData(data) {
+                let getnowdate = new Date().toLocaleTimeString();
+                if (data.code == 200) {
+                    //替换时间
+                    {
+                        let getnowdategg = new Date().toLocaleTimeString();
+                        let ui = optionRecords.xAxis[0].data;
+                        for (let i = 0; i < ui.length; i++) {
+                            //let uoni = ui[i] + 1 - 1;
+                            if (i == ui.length - 1) {
+                                ui[i] = getnowdategg;
+                            } else {
+                                ui[i] = ui[(i + 1)];
+                            }
+                            //console.log(uoni, ui[i]);
+                        }
+                        //CPU数据图
+                        optionRecords.xAxis[0].data = ui;
+
+                    }
+                    let Aui = [];
+                    let Allmui = [];
+                    //替换数据名称
+                    {
+                        let ui = optionRecords.legend.data;
+                        let mui = [];
+                        if (ui.length > 0) {
+                            if (ui.length >= data.data.length) {
+                                for (let i = 0; i < data.data.length; i++) {
+                                    //mui.push(data.data[i].name);
+                                    for (var j = 0; j < ui.length; j++) {
+                                        if (ui[j] == data.data[i].name) {
+                                            Aui.push({ "name": data.data[i], "index": j });
+                                            break;
+                                        } else {
+                                            if (j == (ui.length - 1)) {
+                                                mui.push(data.data[i].name);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            for (var j = 0; j < data.data.length; j++) {
+                                Aui.push({ "name": data.data[j], "index": j });
+                                //mui.push(data.data[j].name);
+                            }
+                        }
+                        for (let i = 0; i < Aui.length; i++) {
+                            Allmui.push(Aui[i].name.name);
+                        }
+                        for (let i = 0; i < mui.length; i++) {
+                            Allmui.push(mui[i]);
+                        }
+                        console.log("【Allmui】", Allmui);
+                        //CPU数据图
+                        optionRecords.legend.data = Allmui;
+                        //CPU饼图
+                        optionPies.legend.data = Allmui;
+                        //Memory内存图
+                        //optionMap.dataset.source = ui;
+                        //optionMap.dataset.source.splice(0, 0, '时间');
+
+                    }
+                    //CPU饼图
+                    let CPUoptionPiesdata = [];
+                    //Memory数据图
+                    let AllMemoryoptionMap = [];
+                    //CPU数据图替换数据series
+                    {
+                        //CPU数据图
+                        let ui = optionRecords.series;
+                        let Allnode = [];
+                        //Memory数据图
+                        let AllMemory = [];
+                        let AllMemoryui = optionMap.dataset.source;
+                        //CPU数据图
+                        if (ui.length > 0) {
+                            //先检测节点是否有更新
+                            for (let i = 0; i < ui.length; i++) {
+                                for (var j = 0; j < Allmui.length; j++) {
+                                    if (Allmui[j] == ui[i].name) {
+                                        //CPU数据图
+                                        Allnode.push(ui[i]);
+                                        break;
+                                    } else if (j == Allmui.length - 1) {
+                                        //新增的
+                                        Allnode.push({
+                                            name: ui[i].name,
+                                            type: 'line',
+                                            stack: '百分比',
+                                            areaStyle: {},
+                                            data: [0, 0, 0, 0, 0, 0, 0]
+                                        });
+                                    }
+                                }
+                            }
+                        } else {
+                            for (var i = 0; i < Allmui.length; i++) {
+                                //CPU数据图 新增的
+                                Allnode.push({
+                                    name: Allmui[i],
+                                    type: 'line',
+                                    stack: '百分比',
+                                    areaStyle: {},
+                                    data: [0, 0, 0, 0, 0, 0, 0]
+                                });
+                            }
+                        }
+                        //CPU数据图
+                        for (let i = 0; i < Allnode.length; i++) {
+                            for (let j = 0; j < Allnode[i].data.length; j++) {
+                                if (j == Allnode[i].data.length - 1) {
+                                    //新增的
+                                    for (var z = 0; z < data.data.length; z++) {
+                                        if (data.data[z].name == Allnode[i].name) {
+                                            //CPU表图
+                                            let CPUoptionPiesDataOne = {};
+                                            CPUoptionPiesDataOne.name = data.data[z].name;
+                                            if (data.data[z].data.length > 0) {
+                                                //CPU表图
+                                                CPUoptionPiesDataOne.value = data.data[z].data[0].cpu;
+                                                //CPU数据图
+                                                Allnode[i].data[j] = data.data[z].data[0].cpu;
+                                            } else {
+                                                //CPU表图
+                                                CPUoptionPiesDataOne.value = 0;
+                                                //CPU数据图
+                                                Allnode[i].data[j] = 0;
+                                            }
+                                            //CPU表图
+                                            CPUoptionPiesdata.push(CPUoptionPiesDataOne);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                } else {
+                                    Allnode[i].data[j] = Allnode[i].data[(j + 1)];
+                                }
+                            }
+                            //let uoni = ui[i] + 1 - 1;
+                            //console.log(uoni, ui[i]);
+                        }
+                        
+                        //Memory数据图
+                        if (AllMemoryui.length > 0) {
+                            //先检测节点是否有更新
+                            for (let i = 1; i < AllMemoryui.length; i++) {
+                                for (var j = 0; j < Allmui.length; j++) {
+                                    if (Allmui[j] == AllMemoryui[i][0]) {
+                                        //Memory数据图
+                                        //AllMemory.push(AllMemoryui[i]);
+                                        AllMemory.push({ name:AllMemoryui[i][0], data:AllMemoryui[i].splice(1,AllMemoryui[i].length)});
+                                        break;
+                                    } else if (j == Allmui.length - 1) {
+                                        //新增的
+                                        optionMap.series.splice(0, 0, { type: 'line', smooth: true, seriesLayoutBy: 'row' });
+                                        AllMemory.push({ name:AllMemoryui[i][0], data:[0, 0, 0, 0, 0, 0, 0]});
+                                    }
+                                }
+                            }
+                        } else {
+                            for (var i = 0; i < Allmui.length; i++) {
+                                //CPU数据图 新增的 Allmui[i]
+                                optionMap.series.splice(0, 0, { type: 'line', smooth: true, seriesLayoutBy: 'row' });
+                                
+                                AllMemory.push({ name:Allmui[i], data:[0, 0, 0, 0, 0, 0, 0]});
+                            }
+                        }
+                        for (var i = 0; i < optionMap.series.length; i++) {
+                            if (optionMap.series[i].id == 'pie') {
+                                optionMap.series[i].encode.itemName = '时间';
+                                optionMap.series[i].encode.value = getnowdate;
+                                optionMap.series[i].encode.tooltip = getnowdate;
+                                optionMap.series[i].label.formatter = '{b} Memory: {@@'+getnowdate+'} ({d}%)';
+                                break;
+                            }
+                        }
+                        //Memory数据图
+                        for (let i = 0; i < AllMemory.length; i++) {
+                            for (let j = 0; j < AllMemory[i].data.length; j++) {
+                                if (j == AllMemory[i].data.length - 1) {
+                                    //新增的
+                                    for (var z = 0; z < data.data.length; z++) {
+                                        if (data.data[z].name == AllMemory[i].name) {
+                                            if (data.data[z].data.length > 0) {
+                                                //Memory数据图
+                                                AllMemory[i].data[j] = data.data[z].data[0].memory;
+                                            } else {
+                                                //Memory数据图
+                                                AllMemory[i].data[j] = 0;
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                } else {
+                                    AllMemory[i].data[j] = AllMemory[i].data[(j + 1)];
+                                }
+                            }
+                            //let uoni = ui[i] + 1 - 1;
+                            //console.log(uoni, ui[i]);
+                        }
+                        for (var i = 0; i < AllMemory.length; i++) {
+                            AllMemory[i].data.splice(0, 0, AllMemory[i].name);
+                            AllMemoryoptionMap.push(AllMemory[i].data);
+                        }
+                        //CPU数据图
+                        optionRecords.series = Allnode;
+                        //CPU表图
+                        optionPies.series[0].data = CPUoptionPiesdata;
+                        //Memory内存图
+                        optionMap.dataset.source = AllMemoryoptionMap;
+                    }
+                    //CPU数据图
+                    optionRecords.title.text = "CPU统计图";
+                    echartsRecords.setOption(optionRecords);
+                    console.log(optionRecords);
+                    //Memory内存图
+                    //通过深克隆解决问题
+                    var onemorememory =JSON.parse(JSON.stringify(optionRecords.xAxis[0].data));
+                    onemorememory.splice(0, 0, '时间');
+                    optionMap.dataset.source.splice(0, 0, onemorememory);
+                    echartsMap.setOption(optionMap);
+                    //CPU表图
+                    optionPies.series[0].data = CPUoptionPiesdata;
+                    echartsPies.setOption(optionPies);
+                } else {
+                    console.log(data);
+                }
+            }
+            //echartsRecords.setOption(optionRecords);
+            wait(3000).then(function () {
+                //var result = postData('http://localhost:5000/api/Health/GetAllComputerInfo', {});
+                //handlerpostData(result);
+
+                //test
+                //fetch('/api/Health/GetAllComputerInfo',
+                //    {
+                //        method: 'GET'
+                //        //headers: {
+                //        //    "Content-type": "application/json; charset=UTF-8"
+                //        //}
+                //    }).then(res => {
+                //        console.log("【res】:", res);
+                //        return res.json();
+                //    }).then(data => {
+                //        console.log("【data】:", data);
+                //        handlerpostData(data);
+                //    });
+                //setTimeout(function () {
+                //    fetch('/api/Health/GetAllComputerInfo',
+                //        {
+                //            method: 'GET'
+                //            //headers: {
+                //            //    "Content-type": "application/json; charset=UTF-8"
+                //            //}
+                //        }).then(res => {
+                //            console.log("【res】:", res);
+                //            return res.json();
+                //        }).then(data => {
+                //            console.log("【data】:", data);
+                //            handlerpostData(data);
+                //        });
+                //}, 6000);
+
+                setInterval(function() {
+                    fetch('/api/Health/GetAllComputerInfo',
+                        {
+                            method: 'GET'
+                            //headers: {
+                            //    "Content-type": "application/json; charset=UTF-8"
+                            //}
+                        }).then(res => {
+                        console.log("【res】:", res);
+                        return res.json();
+                    }).then(data => {
+                        console.log("【data】:", data);
+                        handlerpostData(data);
+                    });
+                }, 8000);
+                
+                fetch('/api/Health/GetCPUMouthly',
+                    {
+                        method: 'GET'
+                        //headers: {
+                        //    "Content-type": "application/json; charset=UTF-8"
+                        //}
+                    }).then(res => {
+                    console.log("【res】:", res);
+                    return res.json();
+                }).then(data => {
+                    console.log("【data】:", data);
+                    handlermonthMethod(data);
+                });
+
+                fetch('/api/Health/GetMouthAverage',
+                    {
+                        method: 'GET'
+                        //headers: {
+                        //    "Content-type": "application/json; charset=UTF-8"
+                        //}
+                    }).then(res => {
+                    console.log("【res】柱状图:", res);
+                    return res.json();
+                }).then(data => {
+                    console.log("【data】柱状图:", data);
+                    handlermonthHistogramMethod(data);
+                });
+            });
+            
+            /**
+             * 玫瑰图表
+             */
+            var echartsPies = echarts.init(document.getElementById('echarts-pies'), 'walden');
+            var optionPies = {
+                title: {
+                    text: 'CPU图表',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b} : {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: [] //['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+                },
+                series: [
+                    {
+                        name: '检测来源',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        roseType: 'radius',
+                        data: [
+                            //{ value: 335, name: '直接访问' },
+                            //{ value: 310, name: '邮件营销' },
+                            //{ value: 234, name: '联盟广告' },
+                            //{ value: 135, name: '视频广告' },
+                            //{ value: 368, name: '搜索引擎' }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            //echartsPies.setOption(optionPies);
+
+
+            /**
+             * 柱状图
+             */
+            let NNNNTime = '@CurrentMouthTime';
+            var echartsDataset = echarts.init(document.getElementById('echarts-dataset'), 'walden');
+
+            var optionDataset = {
+                legend: {},
+                tooltip: {},
+                dataset: {
+                    dimensions: ['时间', '本月内存情况'],
+                    source: [
+                        //{ product: 'Matcha Latte', '本月内存情况': 43.3 },
+                        //{ product: 'Milk Tea', '本月内存情况': 83.1},
+                        //{ product: 'Cheese Cocoa', '本月内存情况': 86.4},
+                        //{ product: 'Walnut Brownie', '本月内存情况': 72.4}
+                    ]
+                },
+                xAxis: { type: 'category' },
+                yAxis: {},
+                // Declare several bar series, each will be mapped
+                // to a column of dataset.source by default.
+                series: [
+                    //{ type: 'bar' },
+                    //{ type: 'bar' },
+                    //{ type: 'bar' }
+                ]
+            };
+
+            echartsDataset.setOption(optionDataset);
+
+
+            /**
+             * 中国地图
+             */
+            var echartsMap = echarts.init(document.getElementById('echarts-map'), 'walden');
+
+
+            var optionMap = {
+                legend: {},
+                tooltip: {
+                    trigger: 'axis',
+                    showContent: false
+                },
+                dataset: {
+                    source: [
+                        //['时间', '0', '0', '0', '0', '0', '0'],
+                        //['Matcha Latte', 41.1, 30.4, 65.1, 53.3, 83.8, 98.7],
+                        //['Milk Tea', 86.5, 92.1, 85.7, 83.1, 73.4, 55.1],
+                        //['Cheese Cocoa', 24.1, 67.2, 79.5, 86.4, 65.2, 82.5],
+                        //['Walnut Brownie', 55.2, 67.1, 69.2, 72.4, 53.9, 39.1]
+                    ]
+                },
+                xAxis: { type: 'category' },
+                yAxis: { gridIndex: 0 },
+                grid: { top: '55%' },
+                series: [
+                    //{ type: 'line', smooth: true, seriesLayoutBy: 'row' },
+                    //{ type: 'line', smooth: true, seriesLayoutBy: 'row' },
+                    //{ type: 'line', smooth: true, seriesLayoutBy: 'row' },
+                    //{ type: 'line', smooth: true, seriesLayoutBy: 'row' },
+                    {
+                        type: 'pie',
+                        id: 'pie',
+                        radius: '30%',
+                        center: ['50%', '25%'],
+                        label: {
+                            formatter: '{b}: {@@2012} ({d}%)'
+                        },
+                        encode: {
+                            itemName: 'product',
+                            value: '2012',
+                            tooltip: '2012'
+                        }
+                    }
+                ]
+            };
+            
+            echartsMap.setOption(optionMap);
+
+
+            // echarts 窗口缩放自适应
+            window.onresize = function () {
+                echartsRecords.resize();
+            }
+
+        });
+    </script>
+</body>
+</html>

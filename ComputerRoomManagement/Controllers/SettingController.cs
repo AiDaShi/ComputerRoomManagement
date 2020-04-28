@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ComputerRoomManagement.DTOModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -29,21 +30,25 @@ namespace ComputerRoomManagement.Controllers
         {
             var UserSortedSet =await _db.SortedSetRangeByRankAsync("ComputerName",0,-1);
             ResposeName<string> RS = new ResposeName<string>();
-            foreach (var item in UserSortedSet)
+            //foreach (var item in UserSortedSet)
+            //{
+            //    if (item.ToString()==Name)
+            //    {
+            //        RS.code = 404;
+            //        RS.msg = $"The ComputerName {Name} is exist!!!";
+            //        return RS;
+            //    }
+            //}
+            var one = UserSortedSet.FirstOrDefault(x => x == Name);
+            if (string.IsNullOrEmpty(one))
             {
-                if (item.ToString()==Name)
+                int i = 0;
+                if (UserSortedSet != null)
                 {
-                    RS.code = 404;
-                    RS.msg = $"The ComputerName {Name} is exist!!!";
-                    return RS;
+                    i = UserSortedSet.Length;
                 }
+                _db.SortedSetAdd("ComputerName", Name, i);
             }
-            int i = 0;
-            if (UserSortedSet!=null)
-            {
-                i = UserSortedSet.Length;
-            }
-            _db.SortedSetAdd("ComputerName", Name, i);
             RS.code = 200;
             RS.data = Name;
             return RS;
